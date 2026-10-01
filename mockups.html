@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мокапи інтерфейсу PostService (Windows Forms та Web)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #e9ecef;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 25px; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .tab-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            background: #bdc3c7;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn.active { background: #2980b9; color: white; }
+        .container { max-width: 1100px; margin: 0 auto; display: none; }
+        .container.active { display: block; }
+        .screen-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .screen-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 6px;
+        }
+
+        /* --- Стилізація під Windows Forms --- */
+        .winforms-window {
+            border: 2px solid #005a9e;
+            background-color: #f0f0f0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            font-size: 13px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .winforms-header {
+            background: #005a9e;
+            color: white;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .winforms-menu {
+            background: #fbfbfb;
+            border-bottom: 1px solid #d0d0d0;
+            padding: 4px 8px;
+            font-size: 12px;
+            display: flex;
+            gap: 15px;
+        }
+        .winforms-body { padding: 15px; }
+        .win-btn {
+            background: #e1e1e1;
+            border: 1px solid #adadad;
+            padding: 5px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .win-btn:hover { background: #e5f1fb; border-color: #0078d7; }
+        .win-grid {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #828790;
+            margin-top: 10px;
+        }
+        .win-grid th { background: #eaeaea; border: 1px solid #d0d0d0; padding: 6px; text-align: left; }
+        .win-grid td { border: 1px solid #e0e0e0; padding: 6px; }
+        .win-grid tr.selected { background-color: #0078d7; color: white; }
+
+        .win-form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .win-form-label { width: 140px; font-weight: 500; }
+        .win-input {
+            width: 250px;
+            padding: 4px 6px;
+            border: 1px solid #7a7a7a;
+            font-size: 12px;
+        }
+        .win-input.error { border: 1.5px solid #d9534f; background: #fff5f5; }
+        .win-error-msg {
+            color: #d9534f;
+            margin-left: 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* --- Стилізація під Web (Адаптивний) --- */
+        .web-window {
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .web-navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .web-nav-links { display: flex; gap: 15px; }
+        .web-nav-links a { color: #ecf0f1; text-decoration: none; font-size: 14px; }
+        .web-body { padding: 20px; }
+        .web-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .web-btn-danger { background: #e74c3c; }
+        .web-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .posting-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            background: #f8fafc;
+            border-left: 4px solid #3498db;
+        }
+        .posting-card-title { font-weight: bold; margin-bottom: 6px; color: #1e293b; }
+        .posting-card-field { font-size: 13px; color: #64748b; margin-bottom: 3px; }
+
+        /* Мобільний фрейм */
+        .mobile-frame {
+            width: 340px;
+            margin: 0 auto;
+            border: 10px solid #2d3436;
+            border-radius: 25px;
+            background: white;
+            overflow: hidden;
+        }
+        .mobile-header { background: #2c3e50; color: white; padding: 12px; display: flex; justify-content: space-between; }
+        .mobile-body { padding: 12px; }
+        .mobile-error-msg { color: #e74c3c; font-size: 11px; margin-top: 3px; display: flex; gap: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1>📦 PostService — Мокапи графічного інтерфейсу</h1>
+    <div class="subtitle">Практична робота: Проєктування GUI для Windows Forms та Web</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('winforms')">1. Windows Forms (Настільний GUI)</button>
+        <button class="tab-btn" onclick="showTab('web')">2. Web Інтерфейс (Десктоп + Мобільний)</button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ВАРІАНТ 1: WINDOWS FORMS                                     -->
+    <!-- ============================================================ -->
+    <div id="winforms" class="container active">
+
+        <!-- Екран 1: Головне вікно -->
+        <div class="screen-card">
+            <div class="screen-title">Екран 1. Головне вікно програми (MainForm)</div>
+            <div class="winforms-window" style="max-width: 650px;">
+                <div class="winforms-header">
+                    <span>Поштовий сервіс PostService v1.0</span>
+                    <span>_ □ ✕</span>
+                </div>
+                <div class="winforms-menu">
+                    <span>Файл</span>
+                    <span>Відправлення</span>
+                    <span>Довідка</span>
+                </div>
+                <div class="winforms-body" style="text-align: center; padding: 40px;">
+                    <h2 style="color: #005a9e; margin-bottom: 10px;">Система обліку відправлень PostService</h2>
+                    <p style="color: #666; margin-bottom: 25px;">Оберіть необхідний розділ для роботи:</p>
+                    <div style="display: flex; justify-content: center; gap: 15px;">
+                        <button class="win-btn" style="padding: 10px 20px; font-weight: bold;">📦 Список відправлень</button>
+                        <button class="win-btn" style="padding: 10px 20px;">ℹ️ Про програму</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Екран 2: Список відправлень -->
+        <div class="screen-card">
+            <div class="screen-title">Екран 2. Список поштових відправлень (PostingsListForm)</div>
+            <div class="winforms-window">
+                <div class="winforms-header">
+                    <span>Список поштових відправлень</span>
+                    <span>_ □ ✕</span>
+                </div>
+                <div class="winforms-body">
+                    <div style="margin-bottom: 10px; display: flex; gap: 8px;">
+                        <button class="win-btn">➕ Створити нове</button>
+                        <button class="win-btn">✏️ Редагувати</button>
+                        <button class="win-btn">🔍 Деталі</button>
+                        <button class="win-btn" style="color: #c0392b;">🗑️ Видалити</button>
+                    </div>
+                    <table class="win-grid">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Трек-номер</th>
+                                <th>Відправник</th>
+                                <th>Отримувач</th>
+                                <th>Вага (кг)</th>
+                                <th>Вартість (грн)</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="selected">
+                                <td>101</td>
+                                <td>PS-839201</td>
+                                <td>Іваненко І.І.</td>
+                                <td>Петренко П.П.</td>
+                                <td>2.5</td>
+                                <td>150.00</td>
+                                <td>В дорозі (Вибрано)</td>
+                            </tr>
+                            <tr>
+                                <td>102</td>
+                                <td>PS-992014</td>
+                                <td>ТОВ "Новатех"</td>
+                                <td>Коваль В.С.</td>
+                                <td>0.8</td>
+                                <td>85.00</td>
+                                <td>Доставлено</td>
+                            </tr>
+                            <tr>
+                                <td>103</td>
+                                <td>PS-440192</td>
+                                <td>Мельник О.М.</td>
+                                <td>Сидоренко Д.В.</td>
+                                <td>5.0</td>
+                                <td>230.00</td>
+                                <td>Оформлено</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Екран 3 & 4: Форма створення та валідація помилок -->
+        <div class="screen-card">
+            <div class="screen-title">Екран 3 та 4. Форма «Нове відправлення» (з показом валідації помилок праворуч)</div>
+            <div class="winforms-window" style="max-width: 750px;">
+                <div class="winforms-header">
+                    <span>Створення нового відправлення</span>
+                    <span>_ □ ✕</span>
+                </div>
+                <div class="winforms-body">
+                    <div class="win-form-row">
+                        <div class="win-form-label">Відправник (ПІБ):</div>
+                        <input class="win-input" value="Іваненко І.І.">
+                    </div>
+                    <div class="win-form-row">
+                        <div class="win-form-label">Отримувач (ПІБ):</div>
+                        <input class="win-input error" value="">
+                        <div class="win-error-msg">⚠️ Поле обов'язкове для заповнення</div>
+                    </div>
+                    <div class="win-form-row">
+                        <div class="win-form-label">Опис вмісту:</div>
+                        <input class="win-input" value="Книги та канцелярія">
+                    </div>
+                    <div class="win-form-row">
+                        <div class="win-form-label">Тип доставки:</div>
+                        <select class="win-input" style="width: 262px;">
+                            <option>Стандартна (у відділення)</option>
+                            <option>Кур'єрська доставка</option>
+                        </select>
+                    </div>
+                    <div class="win-form-row">
+                        <div class="win-form-label">Вага (кг):</div>
+                        <input class="win-input error" value="-1.5">
+                        <div class="win-error-msg">⚠️ Вага має бути числом більше 0</div>
+                    </div>
+                    <div class="win-form-row">
+                        <div class="win-form-label">Оголошена цінність:</div>
+                        <input class="win-input" value="500">
+                    </div>
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button class="win-btn" style="font-weight: bold; background: #0078d7; color: white;">Зберегти</button>
+                        <button class="win-btn">Скасувати</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Екран 5 & 6: Діалог видалення та Вікно Про програму -->
+        <div class="screen-card">
+            <div class="screen-title">Екран 5. Діалог підтвердження видалення та Екран 6. Про програму</div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <!-- Діалог -->
+                <div class="winforms-window" style="width: 320px;">
+                    <div class="winforms-header" style="background: #c0392b;">
+                        <span>Підтвердження видалення</span>
+                        <span>✕</span>
+                    </div>
+                    <div class="winforms-body" style="text-align: center;">
+                        <p>❓ Ви дійсно бажаєте видалити відправлення <b>PS-839201</b>?</p>
+                        <p style="font-size: 11px; color: #888;">Цю дію неможливо буде скасувати.</p>
+                        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+                            <button class="win-btn" style="background: #c0392b; color: white;">Так, видалити</button>
+                            <button class="win-btn">Ні, скасувати</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Про програму -->
+                <div class="winforms-window" style="width: 320px;">
+                    <div class="winforms-header">
+                        <span>Про програму</span>
+                        <span>✕</span>
+                    </div>
+                    <div class="winforms-body" style="text-align: center;">
+                        <h3 style="margin-top:0; color:#005a9e;">PostService Desktop</h3>
+                        <p style="font-size: 12px; margin: 4px;">Версія клієнта: 1.0.0</p>
+                        <p style="font-size: 12px; margin: 4px;">Розробник: Студентська робота</p>
+                        <p style="font-size: 11px; color: #666; margin-top: 15px;">Підключено до PostService REST API</p>
+                        <button class="win-btn" style="margin-top: 10px;">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ВАРІАНТ 2: WEB АДАПТИВНИЙ                                    -->
+    <!-- ============================================================ -->
+    <div id="web" class="container">
+
+        <!-- Десктопний Web вигляд -->
+        <div class="screen-card">
+            <div class="screen-title">Веб-інтерфейс: Десктопний вигляд (Широкий екран)</div>
+            <div class="web-window">
+                <div class="web-navbar">
+                    <div style="font-weight: bold; font-size: 18px;">📦 PostService Web</div>
+                    <div class="web-nav-links">
+                        <a href="#">Головна</a>
+                        <a href="#" style="text-decoration: underline;">Відправлення</a>
+                        <a href="#">Про нас</a>
+                    </div>
+                </div>
+                <div class="web-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">Усі поштові відправлення</h3>
+                        <button class="web-btn">➕ Створити відправлення</button>
+                    </div>
+
+                    <div class="web-card-grid">
+                        <div class="posting-card">
+                            <div class="posting-card-title">Трек: PS-839201</div>
+                            <div class="posting-card-field"><b>Відправник:</b> Іваненко І.І.</div>
+                            <div class="posting-card-field"><b>Отримувач:</b> Петренко П.П.</div>
+                            <div class="posting-card-field"><b>Вага:</b> 2.5 кг | <b>Сума:</b> 150 грн</div>
+                            <div style="margin-top: 10px; display: flex; gap: 6px;">
+                                <button class="web-btn" style="padding: 4px 8px; font-size: 12px;">Деталі</button>
+                                <button class="web-btn web-btn-danger" style="padding: 4px 8px; font-size: 12px;">Видалити</button>
+                            </div>
+                        </div>
+
+                        <div class="posting-card" style="border-left-color: #27ae60;">
+                            <div class="posting-card-title">Трек: PS-992014</div>
+                            <div class="posting-card-field"><b>Відправник:</b> ТОВ "Новатех"</div>
+                            <div class="posting-card-field"><b>Отримувач:</b> Коваль В.С.</div>
+                            <div class="posting-card-field"><b>Вага:</b> 0.8 кг | <b>Сума:</b> 85 грн</div>
+                            <div style="margin-top: 10px; display: flex; gap: 6px;">
+                                <button class="web-btn" style="padding: 4px 8px; font-size: 12px;">Деталі</button>
+                                <button class="web-btn web-btn-danger" style="padding: 4px 8px; font-size: 12px;">Видалити</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мобільний вигляд (Вузький екран) -->
+        <div class="screen-card">
+            <div class="screen-title">Веб-інтерфейс: Мобільний вигляд (Адаптивність + Помилки валідації під полем)</div>
+            <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+                
+                <!-- Мобільний список -->
+                <div class="mobile-frame">
+                    <div class="mobile-header">
+                        <span>📦 PostService</span>
+                        <span>☰</span>
+                    </div>
+                    <div class="mobile-body">
+                        <div style="font-weight: bold; font-size: 14px; margin-bottom: 10px;">Відправлення (2)</div>
+                        <div class="posting-card" style="margin-bottom: 10px; font-size: 12px;">
+                            <div style="font-weight: bold;">PS-839201</div>
+                            <div>Іваненко ➔ Петренко</div>
+                            <div>150 грн | В дорозі</div>
+                        </div>
+                        <div class="posting-card" style="font-size: 12px; border-left-color: #27ae60;">
+                            <div style="font-weight: bold;">PS-992014</div>
+                            <div>Новатех ➔ Коваль</div>
+                            <div>85 грн | Доставлено</div>
+                        </div>
+                        <button class="web-btn" style="width: 100%; margin-top: 15px; font-size: 13px;">➕ Нове відправлення</button>
+                    </div>
+                </div>
+
+                <!-- Мобільна форма з валідацією знизу -->
+                <div class="mobile-frame">
+                    <div class="mobile-header">
+                        <span>Нове відправлення</span>
+                        <span>✕</span>
+                    </div>
+                    <div class="mobile-body" style="font-size: 12px;">
+                        <div style="margin-bottom: 8px;">
+                            <label>Відправник:</label>
+                            <input style="width: 95%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;" value="Іваненко І.І.">
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label>Отримувач:</label>
+                            <input style="width: 95%; padding: 4px; border: 1.5px solid #e74c3c; border-radius: 4px;" value="">
+                            <div class="mobile-error-msg">⚠️ Обов'язкове поле</div>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label>Вага (кг):</label>
+                            <input style="width: 95%; padding: 4px; border: 1.5px solid #e74c3c; border-radius: 4px;" value="-1.5">
+                            <div class="mobile-error-msg">⚠️ Значення має бути більше 0</div>
+                        </div>
+                        <button class="web-btn" style="width: 100%; margin-top: 10px;">Зберегти</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
